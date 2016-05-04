@@ -52,6 +52,9 @@ class OpenStackLatentBuildSlave(AbstractLatentBuildSlave):
                  os_tenant_name,
                  os_auth_url,
                  meta=None,
+                 userdata=None,
+                 key_name=None,
+                 security_groups=None,
                  max_builds=None, notify_on_missing=[], missing_timeout=60 * 20,
                  build_wait_timeout=60 * 10, properties={}, locks=None):
 
@@ -69,6 +72,9 @@ class OpenStackLatentBuildSlave(AbstractLatentBuildSlave):
         self.os_tenant_name = os_tenant_name
         self.os_auth_url = os_auth_url
         self.meta = meta
+        self.userdata = userdata
+        self.key_name = key_name
+        self.security_groups = security_groups
 
     def _getImage(self, os_client):
         # If self.image is a callable, then pass it the list of images. The
@@ -94,6 +100,12 @@ class OpenStackLatentBuildSlave(AbstractLatentBuildSlave):
         boot_kwargs = {}
         if self.meta is not None:
             boot_kwargs['meta'] = self.meta
+        if self.userdata is not None:
+            boot_kwargs['userdata'] = self.userdata
+        if self.key_name is not None:
+            boot_kwargs['key_name'] = self.key_name
+        if self.security_groups is not None:
+            boot_kwargs['security_groups'] = self.security_groups
         instance = os_client.servers.create(*boot_args, **boot_kwargs)
         self.instance = instance
         log.msg('%s %s starting instance %s (image %s)' %
